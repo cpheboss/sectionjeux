@@ -10,15 +10,15 @@
 <body>
 
 <h1>Todo List de CPHE</h1>
-	<ul>
-	<% todolist.forEach(function(item, index) { %>
+	<ul id="todolist">
+<!--	<% todolist.forEach(function(item, index) { %>
 		<li>
 			<a href="/todo/delete/<%=item.id%>">✘</a>
 			[<%=item.id%>] <%=item.text%>
 		</li>
 	<% }); %>
-	</ul>
-	<form action="/todo/add" method="post">
+-->	</ul>
+	<form action="/todo" method="post" id="addtaskform">
 		<p>
 			<label for="newtodo">New TODO : </label>
 			<input type="text" name="newtodo" id="newtodo" autofocus />
@@ -27,9 +27,27 @@
 	</form>
 
 	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
+	<script src="../socket.io/socket.io.js"></script>
 	<script>
             var socket = io.connect('http://localhost:8080');
+			
+			socket.on('add_task', function(task) {
+				var ul = document.getElementById('todolist');
+				var li = document.createElement("li");
+				a = document.createElement('a');
+				a.href = '/todo/delete/' + task.id;
+				a.innerHTML = '✘ ';
+				li.appendChild(a);
+				li.appendChild(document.createTextNode('[' + task.id + '] ' + task.text));
+				ul.appendChild(li);
+			});
+			
+			$('#addtaskform').submit(function() {
+				var task = { id:-1, text:$('#newtodo').val() };
+				socket.emit('newtodo', task);
+				$('newtodo').val('').focus();
+				return false;
+			});
 	</script>
 </body>
 </html>
