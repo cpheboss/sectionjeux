@@ -66,5 +66,18 @@ io.sockets.on('connection', function(socket) {
 	socket.on('delete', function(taskid) {
 		console.log('delete #' + taskid);
 		
+		var idx = tdl.findIndex(function(item) {return item.id == taskid;});
+		if(idx >= 0)
+		{
+			console.log('Deleting ' +tdl[idx].id + '/' + tdl[idx].text);
+			tdl.splice(idx,1);
+			socket.emit('del_task', taskid);
+			socket.broadcast.emit('del_task', taskid);
+		}
+		else
+		{
+			console.log('id ' + id + ' not found');
+		}
+		
 	});
 });
