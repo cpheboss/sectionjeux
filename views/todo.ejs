@@ -1,23 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-        <title>Ma todolist</title>
-        <style>
-            a {text-decoration: none; color: black;}
-        </style>
-
+	<title>Ma todolist</title>
+	<style>
+		a {text-decoration: none; color: black;}
+	</style>
 </head>
 <body>
 
 <h1>Todo List de CPHE</h1>
-	<ul id="todolist">
-<!--	<% todolist.forEach(function(item, index) { %>
-		<li>
-			<a href="/todo/delete/<%=item.id%>">✘</a>
-			[<%=item.id%>] <%=item.text%>
-		</li>
-	<% }); %>
--->	</ul>
+	<ul id="todolist"></ul>
 	<form action="/todo" method="post" id="addtaskform">
 		<p>
 			<label for="newtodo">New TODO : </label>
@@ -45,11 +37,13 @@
 			});
 			socket.on('del_task', function(taskid) {
 				var li = document.getElementById('li_'+taskid);
-				while (li.hasChildNodes()) {
-					li.removeChild(li.lastChild);
+				if(li != null)
+				{
+					while (li.hasChildNodes())
+						li.removeChild(li.lastChild);
+					li.innerHTML = '';
+					li.parentNode.removeChild(li);
 				}
-				li.innerHTML = '';
-				li.parentNode.removeChild(li);
 			});
 			$('#addtaskform').submit(function() {
 				var task = { id:-1, text:$('#newtodo').val() };

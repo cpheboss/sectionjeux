@@ -12,11 +12,9 @@ app.use(morgan('combined'));
 var server = http.Server(app);
 server.listen(8080, '0.0.0.0');
 
-var urlencodedParser = bodyparser.urlencoded({extended : false});
+var nextid=1;
 
-var nextid=3;
-
-var tdl = [{id:1,text:'Bisou'},{id:2,text:'ma'}]; // La todolist partagée
+var tdl = []; // La todolist partagée
 // Un todo = un id + un text
 
 app.get('/', function(req,res) {
@@ -25,28 +23,10 @@ app.get('/', function(req,res) {
 .get('/todo', function(req,res) {
 	res.render('todo.ejs', {todolist:tdl});
 })
-/*.get('/todo/delete/:id', function(req,res) {
-	var id=req.params.id;
-	console.log('Try to delete id ' + id);
-	if(id != '')
-	{
-		var idx = tdl.findIndex(function(item) {return item.id == id;});
-		if(idx >= 0)
-		{
-			console.log('Deleting ' +tdl[idx].id + '/' + tdl[idx].text);
-			tdl.splice(idx,1);
-		}
-		else
-		{
-			console.log('id ' + id + ' not found');
-		}
-	}
-	res.redirect('/todo');
-})*/
 .use(function(req,res) {
 	res.setHeader('Content-Type','text/plain');
 	res.status(404).send('konaipo ' + req.url);
-})
+});
 
 var io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket) {
@@ -55,7 +35,7 @@ io.sockets.on('connection', function(socket) {
 		socket.emit('add_task', item);
 	});
 	socket.on('newtodo', function(task) {
-		console.log('new todo : ' + task.id +'/' + task.text);
+		console.log('New todo : ' + task.id +'/' + task.text);
 		
 		var ntd = {id:nextid++, text:task.text};
 		tdl.push(ntd)
@@ -64,20 +44,18 @@ io.sockets.on('connection', function(socket) {
 		socket.broadcast.emit('add_task', ntd);
 	});
 	socket.on('delete', function(taskid) {
-		console.log('delete #' + taskid);
+		console.log('Delete #' + taskid);
 		
 		var idx = tdl.findIndex(function(item) {return item.id == taskid;});
 		if(idx >= 0)
 		{
-			console.log('Deleting ' +tdl[idx].id + '/' + tdl[idx].text);
 			tdl.splice(idx,1);
 			socket.emit('del_task', taskid);
 			socket.broadcast.emit('del_task', taskid);
 		}
 		else
 		{
-			console.log('id ' + id + ' not found');
+			console.log('id ' + id + ' not found, cannot delete, do nothing');
 		}
-		
 	});
 });
