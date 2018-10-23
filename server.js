@@ -34,10 +34,10 @@ io.sockets.on('connection', function(socket) {
 	tdl.forEach(function(item, index) {
 		socket.emit('add_task', item);
 	});
-	socket.on('newtodo', function(task) {
-		console.log('New todo : ' + task.id +'/' + task.text);
+	socket.on('newtodo', function(tasktxt) {
+		console.log('New todo : ' + tasktxt);
 		
-		var ntd = {id:nextid++, text:task.text};
+		var ntd = {id:nextid++, text:tasktxt};
 		tdl.push(ntd)
 		
 		socket.emit('add_task', ntd);

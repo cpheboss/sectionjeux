@@ -46,8 +46,8 @@
 				}
 			});
 			$('#addtaskform').submit(function() {
-				var task = { id:-1, text:$('#newtodo').val() };
-				socket.emit('newtodo', task);
+				var tasktxt = $('#newtodo').val();
+				socket.emit('newtodo', tasktxt);
 				$('newtodo').val('').focus();
 				return false;
 			});
